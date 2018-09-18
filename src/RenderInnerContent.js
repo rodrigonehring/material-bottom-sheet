@@ -5,6 +5,7 @@ const styles = ({ palette }) => ({
   content: {
     background: palette.background.paper,
     width: '100%',
+    paddingBottom: 48 + 16,
   },
 })
 

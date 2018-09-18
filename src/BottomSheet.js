@@ -6,6 +6,7 @@ import Typography from '@material-ui/core/Typography'
 import throttle from 'lodash.throttle'
 import Header from './Header'
 import TinyHeader from './TinyHeader'
+import Footer from './Footer'
 import RenderInnerContent from './RenderInnerContent'
 import { getViewportSize } from './utils'
 
@@ -92,7 +93,7 @@ class BottomSheet extends Component {
     stageAfter: 1,
     stage: 1,
     stageBefore: 1,
-    y: this.props.headerHeight,
+    y: this.props.headerHeight + 48,
     dragging: false,
     showTinyHeader: false,
     viewport: getViewportSize(),
@@ -113,7 +114,7 @@ class BottomSheet extends Component {
       return viewport.height * 0.8
     }
 
-    return headerHeight
+    return headerHeight + 48
   }
 
   block = (e) => e.preventDefault()
@@ -281,6 +282,7 @@ class BottomSheet extends Component {
         </div>
 
         <TinyHeader show={showTinyHeader} />
+
         <div
           className={cx(classes.bottomSheet, classes[`stage${stage}`], {
             [classes.dragging]: dragging,
@@ -307,6 +309,7 @@ class BottomSheet extends Component {
             })} */}
           </div>
         </div>
+        <Footer stage={stage} show changeStage={this.changeStage} />
       </div>
     )
   }

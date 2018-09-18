@@ -11,7 +11,7 @@ const styles = () => ({
 })
 
 const App = ({ classes }) => {
-  const Page = () => <div classes={classes.fakeContent}>fake content 9</div>
+  const Page = () => <div classes={classes.fakeContent}>fake content 1</div>
   return (
     <>
       <CssBaseline />

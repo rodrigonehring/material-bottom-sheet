@@ -87,7 +87,7 @@ function FakeContent({ classes }) {
       <div className={classes.content}>
         <Text>Some fake content</Text>
       </div>
-      <Divider />
+      {/* <Divider /> */}
     </div>
   )
 }

@@ -8,7 +8,7 @@ import ArrowBack from '@material-ui/icons/ArrowBack'
 const styles = ({ palette }) => ({
   tinyHeaderTitle: {},
   tinyHeader: {
-    position: 'absolute',
+    position: 'fixed',
     zIndex: 10,
     height: 56,
     width: '100%',
