@@ -20,10 +20,12 @@ const styles = ({ palette }) => ({
     padding: 8,
     transition: '.3s ease',
     opacity: 0,
+    visibility: 'hidden',
     color: palette.primary.contrastText,
   },
   show: {
     opacity: 1,
+    visibility: 'visible',
   },
 })
 

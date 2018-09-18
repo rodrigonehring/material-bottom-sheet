@@ -20,21 +20,21 @@ module.exports = {
         loader: 'babel-loader',
         exclude: /(node_modules)/,
       },
-      // {
-      //   test: /\.(png|jpg|gif|svg)$/,
-      //   use: [
-      //     {
-      //       loader: 'file-loader',
-      //       options: {
-      //         outputPath: commonPaths.imagesFolder,
-      //       },
-      //     },
-      //   ],
-      // },
-      // {
-      //   test: /\.(css|scss)$/,
-      //   use: ['style-loader', 'css-loader'],
-      // },
+      {
+        test: /\.(png|jpg|gif|svg)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              outputPath: commonPaths.imagesFolder,
+            },
+          },
+        ],
+      },
+      {
+        test: /\.(css|scss)$/,
+        use: ['style-loader', 'css-loader'],
+      },
       // {
       //   test: /\.(woff2|ttf|woff|eot)$/,
       //   use: [

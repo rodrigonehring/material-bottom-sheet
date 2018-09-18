@@ -20,7 +20,7 @@ const styles = ({ palette }) => ({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
-    opacity: 0,
+    // opacity: 0,
   },
   stage1: {
     borderTop: '1px solid #e0e0e0',
@@ -33,21 +33,31 @@ const styles = ({ palette }) => ({
   },
 })
 
-function Footer({ classes, show, stage, changeStage }) {
+function Footer({ classes, stage, changeStage, phone = '47 1234-5647' }) {
   return (
-    <div
-      className={cx(classes.footer, classes[`stage${stage}`], {
-        [classes.show]: show,
-      })}
-    >
-      {stage === 1 && <Button size="small">47 1234-5647</Button>}
+    <div className={cx(classes.footer, classes[`stage${stage}`])}>
+      {stage === 1 && (
+        <Button id="bt-footer-phone" size="small">
+          {phone}
+        </Button>
+      )}
       {stage === 2 && (
-        <Button size="small" onClick={() => changeStage(1)}>
+        <Button
+          size="small"
+          id="bt-footer-content"
+          onClick={() => changeStage(1)}
+        >
           <Map style={{ marginRight: 8 }} />
           Show Map
         </Button>
       )}
-      <Button mini variant="raised" color="primary" size="small">
+      <Button
+        mini
+        variant="raised"
+        color="primary"
+        size="small"
+        id="bt-footer-routes"
+      >
         <Directions style={{ marginRight: 8 }} />
         Routes
       </Button>

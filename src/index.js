@@ -5,13 +5,13 @@ import { withStyles } from '@material-ui/core/styles'
 
 import BottomSheet from './BottomSheet'
 import FakeContent from './FakeContent'
+import Page from './FakeContent/Page'
 
 const styles = () => ({
   fakeContent: {},
 })
 
 const App = ({ classes }) => {
-  const Page = () => <div classes={classes.fakeContent}>fake content 1</div>
   return (
     <>
       <CssBaseline />

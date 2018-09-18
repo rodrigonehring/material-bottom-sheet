@@ -1,13 +1,16 @@
-import React, { PureComponent, Component } from 'react'
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames'
 import { withStyles } from '@material-ui/core/styles'
 import Typography from '@material-ui/core/Typography'
 import throttle from 'lodash.throttle'
+
 import Header from './Header'
+import HeaderBottom from './HeaderBottom'
 import TinyHeader from './TinyHeader'
 import Footer from './Footer'
 import RenderInnerContent from './RenderInnerContent'
+import RenderPage from './RenderPage'
 import { getViewportSize } from './utils'
 
 const styles = ({ palette }) => ({
@@ -17,14 +20,17 @@ const styles = ({ palette }) => ({
     height: '100%',
     position: 'fixed',
     overflowY: 'auto',
+    '-webkit-overflow-scrolling': 'touch',
+    transition: '.3s ease',
+    visibility: 'visible',
     overscrollBehavior: 'contain',
     '&$dragging': {
       overflowY: 'hidden',
     },
-    '&$stage1': {
-      overflowY: 'hidden',
-      background: 'rgba(0,0,0,0.2)',
-    },
+  },
+  hideBottomSheet: {
+    opacity: 0,
+    visibility: 'hidden',
   },
   content: {
     // border: '1px solid blue',
@@ -62,41 +68,33 @@ const styles = ({ palette }) => ({
   stage1: {},
   stage2: {},
   stage3: {},
-  page: {
-    width: '100%',
-    height: '100%',
-    position: 'fixed',
-    left: 0,
-    top: 0,
-  },
 })
 
-class BottomSheet extends Component {
+export class BottomSheet extends Component {
   static propTypes = {
     // from @material-ui/styles
     classes: PropTypes.object,
 
-    // content of bottomSheet
-    children: PropTypes.func,
-
-    stage2Pos: PropTypes.number,
-    barHeight: PropTypes.number,
+    headerHeight: PropTypes.number,
+    getViewportSize: PropTypes.func,
   }
 
   static defaultProps = {
-    stage2Pos: 0.5,
     headerHeight: 120,
-    bottomTriggerTop: 20,
+    getViewportSize,
   }
 
-  state = {
-    stageAfter: 1,
-    stage: 1,
-    stageBefore: 1,
-    y: this.props.headerHeight + 48,
-    dragging: false,
-    showTinyHeader: false,
-    viewport: getViewportSize(),
+  constructor(props) {
+    super(props)
+    this.state = {
+      stageAfter: 1,
+      stage: 1,
+      stageBefore: 1,
+      y: props.headerHeight + 48,
+      dragging: false,
+      showTinyHeader: false,
+      viewport: props.getViewportSize(),
+    }
   }
 
   containerRef = React.createRef()
@@ -139,17 +137,20 @@ class BottomSheet extends Component {
   dragTime = 0
   blockedScroll = false
 
-  handleStart = (e) => {
-    this.activeBlock()
+  handleStart(e) {
+    // this.activeBlock()
     // console.log('handleStart', this.blockedScroll)
     this.lastPageY = e.touches[0].pageY
     this.dragStartedOn = e.touches[0].pageY
   }
 
-  handleDrag = (e) => {
+  handleDrag(e) {
     const touch = e.touches[0]
+    // console.log('handleDrag', this.dragTime, touch)
     requestAnimationFrame(() => {
       this.dragTime += 1
+
+      // console.log('handleDrag', this.dragTime)
 
       // deve ser só um click
       if (this.dragTime < 2) {
@@ -199,8 +200,8 @@ class BottomSheet extends Component {
     return stage
   }
 
-  handleStop = () => {
-    this.desactiveBlock()
+  handleStop() {
+    // this.desactiveBlock()
     // deve ser só um click
     if (this.dragTime < 2) {
       return
@@ -225,7 +226,7 @@ class BottomSheet extends Component {
     } = this.state
     const { scrollTop } = this.containerRef.current
 
-    const breakPoint = height - height * 0.8 - this.props.headerHeight + 16
+    const breakPoint = height - height * 0.8 - this.props.headerHeight + 16 + 48
 
     if (scrollTop > breakPoint && !showTinyHeader)
       this.setState({ showTinyHeader: true })
@@ -246,10 +247,10 @@ class BottomSheet extends Component {
   }
 
   dragHandlers = {
-    onTouchStart: this.handleStart,
-    onTouchMove: this.handleDrag,
-    onTouchEnd: this.handleStop,
-    onTouchCancel: this.handleStop,
+    onTouchStart: this.handleStart.bind(this),
+    onTouchMove: this.handleDrag.bind(this),
+    onTouchEnd: this.handleStop.bind(this),
+    onTouchCancel: this.handleStop.bind(this),
   }
 
   render() {
@@ -260,17 +261,23 @@ class BottomSheet extends Component {
       dragging,
       viewport,
       stageAfter,
-      newState,
       showTinyHeader,
     } = this.state
     const positionY = this.calcTopDistance()
     const transform = `translateY(-${positionY}px)`
+    const headerTitle = 'Some nice biiiiiiiiiiiig title, fit? Yer or no?'
 
     return (
       <div className={classes.wrapper} style={{ height: viewport.height }}>
-        <div className={classes.page}>
-          <Page />
-        </div>
+        <RenderPage
+          stage={stage}
+          Page={Page}
+          containerHeight={
+            dragging || stage === 1
+              ? viewport.height - headerHeight - 48
+              : viewport.height - viewport.height * 0.8
+          }
+        />
 
         <div className={classes.debug}>
           stage: {stage} <br />
@@ -284,8 +291,10 @@ class BottomSheet extends Component {
         <TinyHeader show={showTinyHeader} />
 
         <div
+          id="bt-main"
           className={cx(classes.bottomSheet, classes[`stage${stage}`], {
             [classes.dragging]: dragging,
+            [classes.hideBottomSheet]: !dragging && stage !== 2,
           })}
           ref={this.containerRef}
           onScroll={this.handleScrollThrottle}
@@ -296,19 +305,23 @@ class BottomSheet extends Component {
             ref={this.dragRef}
           >
             <Header
-              stage={dragging ? stageAfter : stage}
+              stage={stage}
+              dragging={dragging}
+              stageAfter={stageAfter}
               dragHandlers={this.dragHandlers}
-              title="Some nice biiiiiiiiiiiig title, fit? Yer or no?"
+              title={headerTitle}
               changeStage={this.changeStage}
             />
             <RenderInnerContent stage={stage} Content={Content} />
-            {/* {children({
-              stage,
-              changeStage: this.changeStage,
-              Content: this.renderContent,
-            })} */}
           </div>
         </div>
+        <HeaderBottom
+          changeStage={this.changeStage}
+          dragHandlers={this.dragHandlers}
+          title={headerTitle}
+          stage={stage}
+          dragging={dragging}
+        />
         <Footer stage={stage} show changeStage={this.changeStage} />
       </div>
     )
